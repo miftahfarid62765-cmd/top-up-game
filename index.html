@@ -20,7 +20,7 @@
         // menambahkan aplikasi web.
         
         const firebaseConfig = {
-            apiKey: "AIzaSyD509Mf6PPRxyteXubs2i7Wm87puHjkqXM",
+         apiKey: "AIzaSyD509Mf6PPRxyteXubs2i7Wm87puHjkqXM",
 
   authDomain: "sultan-top-up-186c0.firebaseapp.com",
 
@@ -41,7 +41,6 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const statusMessage = document.getElementById('statusMessage');
             
             // --- FIREBASE SETUP ---
             if (firebaseConfig && firebaseConfig.apiKey !== "YOUR_API_KEY") {
@@ -50,10 +49,6 @@
                     auth = getAuth(app);
                     db = getFirestore(app);
 
-                    statusMessage.textContent = 'Menghubungkan ke Firebase...';
-                    statusMessage.className = 'p-3 mb-4 rounded-lg text-center font-medium bg-blue-900 text-blue-300';
-                    statusMessage.classList.remove('hidden');
-
                     await signInAnonymously(auth);
                     console.log("Berhasil masuk secara anonim.");
 
@@ -61,8 +56,6 @@
                         if (user) {
                             const userId = user.uid;
                             console.log("Authenticated with user ID:", userId);
-                            statusMessage.textContent = `Berhasil terhubung ke database. Fitur keranjang aktif. User ID: ${userId}`;
-                            statusMessage.className = 'p-3 mb-4 rounded-lg text-center font-medium bg-green-900 text-green-300';
                             
                             // Fungsi-fungsi database
                             const cartRef = collection(db, 'artifacts', appId, 'users', userId, 'cartItems');
@@ -163,9 +156,6 @@
 
                         } else {
                             console.log("Not authenticated.");
-                            statusMessage.textContent = 'Gagal terhubung ke Firebase. Fitur keranjang tidak akan berfungsi.';
-                            statusMessage.className = 'p-3 mb-4 rounded-lg text-center font-medium bg-red-900 text-red-300';
-                            statusMessage.classList.remove('hidden');
                             cartItemsContainer.innerHTML = '<p class="text-gray-400 text-center">Keranjang kosong. Fitur ini membutuhkan koneksi ke Firebase.</p>';
                             cartCountElement.textContent = 0;
                             cartTotalElement.textContent = `Total: Rp 0`;
@@ -173,15 +163,10 @@
                     });
 
                 } catch (error) {
-                    statusMessage.textContent = `Terjadi kesalahan saat menginisialisasi Firebase. Fitur keranjang tidak akan berfungsi. Detail: ${error.message}`;
-                    statusMessage.className = 'p-3 mb-4 rounded-lg text-center font-medium bg-red-900 text-red-300';
-                    statusMessage.classList.remove('hidden');
                     console.error("Kesalahan inisialisasi Firebase:", error);
                 }
             } else {
-                statusMessage.textContent = 'Gagal memuat konfigurasi Firebase. Pastikan Anda sudah mengganti kode placeholder.';
-                statusMessage.className = 'p-3 mb-4 rounded-lg text-center font-medium bg-red-900 text-red-300';
-                statusMessage.classList.remove('hidden');
+                console.error('Gagal memuat konfigurasi Firebase. Pastikan Anda sudah mengganti kode placeholder.');
             }
 
             // Data dummy
@@ -224,7 +209,7 @@
             const closeLoginModal = document.getElementById('closeLoginModal');
             const googleSignInButton = document.getElementById('googleSignInButton');
             const loginMessage = document.getElementById('loginMessage');
-            const searchInput = document.getElementById('searchInput');
+            const homePageSearchInput = document.getElementById('homePageSearchInput');
             const searchInputMobile = document.getElementById('searchInputMobile');
             const categoryLinks = document.querySelectorAll('.category-link');
             const voucherInput = document.getElementById('voucherInput');
@@ -235,7 +220,6 @@
             let selectedNominal = null;
             let currentDiscount = 0;
 
-            // Logika navigasi yang diperbaiki
             const showPage = (pageId) => {
                 pages.forEach(page => {
                     page.classList.add('hidden');
@@ -253,7 +237,6 @@
                 });
             });
 
-            // Logika menu mobile
             const mobileMenuButton = document.getElementById('mobileMenuButton');
             const mobileMenu = document.getElementById('mobileMenu');
 
@@ -301,13 +284,19 @@
                 });
             });
 
-            const performSearch = (e) => {
-                const query = e.target.value.toLowerCase();
-                const filteredGames = gamesData.filter(game => game.title.toLowerCase().includes(query));
+            const performSearch = (query) => {
+                const filteredGames = gamesData.filter(game => game.title.toLowerCase().includes(query.toLowerCase()));
                 renderGames(filteredGames, topUpGamesGrid);
             };
-            searchInput.addEventListener('input', performSearch);
-            searchInputMobile.addEventListener('input', performSearch);
+
+            homePageSearchInput.addEventListener('input', (e) => {
+                showPage('top-up-page');
+                performSearch(e.target.value);
+            });
+            searchInputMobile.addEventListener('input', (e) => {
+                showPage('top-up-page');
+                performSearch(e.target.value);
+            });
 
             topUpOptions.forEach(option => {
                 const optionCard = document.createElement('div');
@@ -393,16 +382,9 @@
                 <i class="fas fa-gem text-purple-400"></i>
                 <span>Sultan Top Up</span>
             </a>
-            <div class="hidden md:flex space-x-6">
-                <a href="#home" class="nav-link text-white hover:text-purple-400 transition-colors duration-200" data-page="home-page">Beranda</a>
-                <a href="#top-up" class="nav-link text-white hover:text-purple-400 transition-colors duration-200" data-page="top-up-page">Top Up</a>
-                <a href="#faq" class="nav-link text-white hover:text-purple-400 transition-colors duration-200" data-page="faq-page">FAQ</a>
-            </div>
+            <!-- Tautan Navigasi Desktop Dihapus -->
             <div class="flex items-center space-x-4">
-                <div class="relative hidden md:block">
-                    <input type="text" id="searchInput" placeholder="Cari Game..." class="bg-gray-700/50 text-white rounded-full pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all duration-200">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                </div>
+                <!-- Kotak Pencarian Desktop Dihapus -->
                 <button id="cartButton" class="relative bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full transition-transform transform hover:scale-110">
                     <i class="fas fa-shopping-cart text-lg"></i>
                     <span id="cartCount" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">0</span>
@@ -411,13 +393,13 @@
                     Masuk
                 </button>
             </div>
-            <div class="md:hidden flex items-center space-x-2">
+            <div class="flex items-center space-x-2">
                 <button id="mobileMenuButton" class="text-white text-2xl focus:outline-none">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
         </nav>
-        <div id="mobileMenu" class="md:hidden bg-gray-800/80 backdrop-blur-md px-4 pt-2 pb-4 hidden">
+        <div id="mobileMenu" class="bg-gray-800/80 backdrop-blur-md px-4 pt-2 pb-4 hidden">
             <div class="relative mb-4">
                 <input type="text" id="searchInputMobile" placeholder="Cari Game..." class="w-full bg-gray-700/50 text-white rounded-full pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
@@ -441,7 +423,7 @@
         <div id="home-page" class="page-content active">
             <div class="container mx-auto px-4 py-8">
                 <!-- Promo Slider -->
-                <section class="relative overflow-hidden w-full rounded-2xl mb-12 shadow-lg h-56 md:h-80">
+                <section class="relative overflow-hidden w-full rounded-2xl mb-6 shadow-lg h-56">
                     <div class="slider-wrapper flex transition-transform duration-700 ease-in-out h-full">
                         <div class="flex-shrink-0 w-full h-full bg-gradient-to-r from-purple-800 to-pink-500 rounded-2xl flex items-center justify-center p-8">
                             <h2 class="text-white text-3xl md:text-5xl font-extrabold text-center drop-shadow-lg">Diskon 50% untuk Top Up Pertama!</h2>
@@ -455,10 +437,16 @@
                     </div>
                 </section>
                 
+                <!-- Search Input Home Page -->
+                <div class="relative mb-12">
+                    <input type="text" id="homePageSearchInput" placeholder="Cari Game..." class="w-full bg-gray-700/50 text-white rounded-full pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+
                 <!-- Game Populer -->
                 <section class="mb-12">
                     <h2 class="text-3xl font-bold text-white mb-6 text-center">Game Populer</h2>
-                    <div id="gamesGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                    <div id="gamesGrid" class="grid grid-cols-2 gap-6">
                         <!-- Game cards will be dynamically inserted here -->
                     </div>
                 </section>
@@ -466,7 +454,7 @@
                 <!-- Keunggulan -->
                 <section class="mb-12">
                     <h2 class="text-3xl font-bold text-white mb-8 text-center">Mengapa Pilih Kami?</h2>
-                    <div class="grid md:grid-cols-3 gap-8 text-center">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 text-center">
                         <div class="bg-gray-800/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700/50 shadow-lg">
                             <i class="fas fa-tachometer-alt text-5xl text-purple-400 mb-4"></i>
                             <h3 class="font-bold text-xl text-white mb-2">Proses Cepat</h3>
@@ -491,13 +479,13 @@
         <div id="top-up-page" class="page-content hidden">
             <div class="container mx-auto px-4 py-8">
                 <h1 class="text-3xl font-bold text-white text-center mb-8">Pilih Game untuk Top Up</h1>
-                <div class="flex justify-center mb-8 space-x-4">
+                <div class="flex flex-wrap justify-center mb-8 gap-4">
                     <a href="#" class="category-link active text-white bg-gray-800/50 px-4 py-2 rounded-full hover:bg-purple-600 transition-colors duration-200" data-category="all">Semua</a>
                     <a href="#" class="category-link text-white bg-gray-800/50 px-4 py-2 rounded-full hover:bg-purple-600 transition-colors duration-200" data-category="moba">MOBA</a>
                     <a href="#" class="category-link text-white bg-gray-800/50 px-4 py-2 rounded-full hover:bg-purple-600 transition-colors duration-200" data-category="fps">FPS</a>
                     <a href="#" class="category-link text-white bg-gray-800/50 px-4 py-2 rounded-full hover:bg-purple-600 transition-colors duration-200" data-category="rpg">RPG</a>
                 </div>
-                <div id="topUpGamesGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-12">
+                <div id="topUpGamesGrid" class="grid grid-cols-2 gap-6 mb-12">
                     <!-- Game cards will be dynamically inserted here -->
                 </div>
                 
@@ -509,7 +497,7 @@
                         <input type="text" id="username" placeholder="Masukkan ID Pengguna Anda" class="w-full bg-gray-700 text-white rounded-lg p-3 mb-6 focus:outline-none focus:ring-2 focus:ring-purple-400">
 
                         <h3 class="text-xl font-bold text-white mb-2">2. Pilih Nominal Diamond</h3>
-                        <div id="topUpOptions" class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+                        <div id="topUpOptions" class="grid grid-cols-2 gap-4 mb-6">
                             <!-- Opsi top up akan dimasukkan di sini -->
                         </div>
 
